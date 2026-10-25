@@ -1,0 +1,6 @@
+/game/
+*.tar.gz
+/node_modules/
+/.npm-cache/
+/.sites-*
+*.log

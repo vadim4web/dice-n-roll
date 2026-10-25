@@ -14,3 +14,4 @@
 @media(max-width:560px){.header-actions{gap:10px}.mobile-tools{display:flex;gap:4px}.mobile-tools .icon-button{background:transparent;width:26px;height:30px}.mobile-tools .sound-button{margin:0}.mobile-tools svg{width:15px;height:15px}.help-button{padding:0}.game-table{height:451px}.dice-stage{display:grid;grid-template-columns:repeat(3,60px);gap:18px 24px;height:206px;max-width:250px;justify-content:center;align-content:center}.die{width:60px;padding:11px;border-radius:12px}.die-wrap{gap:10px}.die-label{font-size:7px}.table-message{margin-top:8px}.selection-strip{margin-top:9px}}
 @media(max-width:360px){.header-actions{gap:6px}.mobile-tools{gap:0}.mobile-tools .icon-button{width:23px}.help-button{font-size:9px}.dice-stage{grid-template-columns:repeat(3,56px);column-gap:23px}.die{width:56px;padding:10px}}
 
+.accent{color:var(--lime)}.rules-note{font-size:10px;margin-top:18px}.results-caption{justify-content:center}

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { scoreDice, bestSelection, randomDie, bustProbability } from '../dist/engine.js';
+import { scoreDice, bestSelection, randomDie, bustProbability } from '../src/game/engine.js';
 test('single scoring dice and invalid mixed selections', () => {
   assert.equal(scoreDice([1, 5, 1]).points, 250);
   assert.equal(scoreDice([1, 2]).valid, false);

@@ -1,133 +1,106 @@
 <script setup>
-import { ref } from 'vue';
 import IconSprite from './components/IconSprite.vue';
 import SvgIcon from './components/SvgIcon.vue';
-import GameDie from './components/GameDie.vue';
-import DieFace from './components/DieFace.vue';
+import DominoTile from './components/DominoTile.vue';
+import GoldenDiceButton from './components/GoldenDiceButton.vue';
+import MatchConnections from './components/MatchConnections.vue';
 import GameModal from './components/GameModal.vue';
 import { useDiceGame } from './composables/useDiceGame.js';
 
 const {
-  game, muted, busy, modal, toastMessage, confetti, bustFlash, newRecord, pendingMode, visualDice, heldDice,
-  selection, validSelection, prospective, recordList, bestRecord, chance, goal, progress, time, urgent,
-  rollLabel, riskText, messages, tip, format, roll, bank, toggleDie, newGame, requestNewGame, toggleSound,
+  game, history, busy, modal, selectedCell, probabilityAction, toastMessage, visualUpper, lastGain,
+  storageAvailable, soundOn, autoFlow, confetti, analysis, hasAnalysisLog, board, selectedTarget, rollProbability, dropProbability,
+  chosenProbability, rawProbability, ardor, canRoll, canDrop, bestScore, activeTile, lockOptions, lastResult,
+  rollTitle, dropTitle, COMBINATIONS, PROBABILITY_TARGETS, format, percent, perform, selectCell, purchaseLock,
+  releaseLock, changeTarget, showAnalysis, finish, requestFinish, requestNew, startNew, toggleSound, toggleAutoFlow, exportLog,
 } = useDiceGame();
-const rollButton = ref(null);
-function goPlay() { modal.value = ''; rollButton.value?.focus(); }
-const recordDate = date => new Date(date).toLocaleDateString('ru-RU');
+const isMatched = (row, index) => board.value.matches.some(match => row === 'upper' ? match.upperIndex === index : match.lowerIndices.includes(index));
+const dateLabel = value => new Date(value).toLocaleString('ru-RU', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+const duration = ms => `${Math.floor(ms / 60000)} мин ${Math.floor(ms % 60000 / 1000)} с`;
+function viewSession(item) { analysis.value = item; modal.value = 'analysis'; }
+const comboLabel = id => COMBINATIONS.find(combo => combo.id === id)?.label || 'Совпадение';
 </script>
 
 <template>
   <IconSprite />
-  <aside class="rail" aria-label="Основное меню">
-    <a href="./" class="brand-mark" aria-label="Dice’n’Roll, главная"><SvgIcon name="dice" /></a>
-    <div class="rail-main">
-      <button class="rail-button active" aria-label="Играть" title="Играть" @click="goPlay"><SvgIcon name="dice" /></button>
-      <button class="rail-button" aria-label="Личные рекорды" title="Личные рекорды" @click="modal = 'records'"><SvgIcon name="cup" /></button>
-      <button class="rail-button" aria-label="Как играть" title="Как играть" @click="modal = 'rules'"><SvgIcon name="info" /></button>
-    </div>
-    <button class="rail-button sound-button" :aria-label="muted ? 'Включить звук' : 'Выключить звук'" :title="muted ? 'Включить звук' : 'Выключить звук'" @click="toggleSound"><SvgIcon :name="muted ? 'mute' : 'sound'" /></button>
-    <div class="rail-footer">D’R</div>
-  </aside>
   <div class="app-shell">
     <header class="topbar">
-      <a href="./" class="wordmark">dice<span>’n’</span>roll<span class="wordmark-dot">.</span></a>
-      <div class="header-tag"><span class="live-dot" /> МАЛЕНЬКИЙ ПЕРЕРЫВ. БОЛЬШАЯ УДАЧА.</div>
-      <div class="header-actions">
-        <div class="mobile-tools">
-          <button class="icon-button sound-button" :aria-label="muted ? 'Включить звук' : 'Выключить звук'" @click="toggleSound"><SvgIcon :name="muted ? 'mute' : 'sound'" /></button>
-          <button class="icon-button" aria-label="Личные рекорды" @click="modal = 'records'"><SvgIcon name="cup" /></button>
-        </div>
-        <button class="help-button" @click="modal = 'rules'"><SvgIcon name="info" /> Как играть <span>↗</span></button>
-      </div>
+      <a href="./" class="brand" title="Dice’n’Roll — покер костей. Текущая сессия сохраняется автоматически."><span class="brand-dice"><SvgIcon name="dice" /></span><span>dice<span class="brand-n">’n’</span>roll<span class="brand-dot">.</span></span></a>
+      <span class="header-caption">A LITTLE LUCK. A LITTLE STRATEGY.</span>
+      <nav class="header-actions" aria-label="Меню игры">
+        <button class="quiet-button sound-button" :aria-label="soundOn ? 'Выключить звук' : 'Включить звук'" :title="soundOn ? 'Выключить звуки барабанов и совпадений' : 'Включить звуки барабанов и совпадений'" @click="toggleSound"><SvgIcon :name="soundOn ? 'sound' : 'mute'" /></button>
+        <button class="quiet-button" title="Посмотреть сохранённые в этом браузере сессии и их анализ" @click="modal = 'records'"><SvgIcon name="cup" /><span>Мои сессии</span></button>
+        <button class="quiet-button" title="Краткое объяснение совпадений, FIFO, фиксаций, очков и вероятностей" @click="modal = 'rules'"><SvgIcon name="info" /><span>Как играть</span></button>
+      </nav>
     </header>
     <main>
-      <section class="page-heading">
-        <div><div class="eyebrow"><span /> ROLL. RISK. REPEAT.</div><h1>А вдруг <em>повезёт?</em><span class="heading-star">✳</span></h1><p>Шесть костей. Один выбор. Ещё один бросок?</p></div>
-        <div class="best-badge"><div class="trophy-circle"><SvgIcon name="cup" /></div><div><span>ТВОЙ ЛУЧШИЙ СЧЁТ</span><strong id="personal-best">{{ format(bestRecord) }}</strong></div><div class="badge-star">✧</div></div>
+      <section class="hero">
+        <div><div class="eyebrow"><span class="live-dot" /> ПОКЕР КОСТЕЙ · ТВОЙ АЗАРТ В ДЕЙСТВИИ</div><h1>Удача любит <em>движение.</em><span class="hero-spark">✳</span></h1><p>Крути верх. Меняй низ. Лови свои совпадения.</p></div>
+        <div class="hero-right"><span class="save-status" :title="storageAvailable ? 'Каждый ход, фиксация и смена цели записываются в LocalStorage. При выходе сохраняется анализ; при возврате сессия продолжается.' : 'Браузер не разрешил сохранить данные. Текущая игра продолжает работать, но после закрытия прогресс может потеряться.'"><span class="live-dot" />{{ storageAvailable ? 'Сессия сохраняется' : 'Сохранение недоступно' }}</span><button class="text-button" :disabled="!!busy" title="Завершить текущую сессию, сохранить журнал и увидеть сводку игровых решений" @click="requestFinish">{{ game.phase === 'finished' ? 'Итоги сессии' : 'Завершить сессию' }} <SvgIcon name="arrow" /></button></div>
       </section>
-      <div class="game-layout">
-        <section class="game-column" aria-label="Игровой стол">
-          <div class="game-toolbar">
-            <div class="mode-tabs" role="group" aria-label="Режим игры">
-              <button :class="['mode-tab', { active: game.mode === 'classic' }]" :aria-pressed="game.mode === 'classic'" :disabled="busy" data-mode="classic" @click="game.mode !== 'classic' && requestNewGame('classic')"><SvgIcon name="dice" /> Классика <span>10 раундов</span></button>
-              <button :class="['mode-tab', { active: game.mode === 'blitz' }]" :aria-pressed="game.mode === 'blitz'" :disabled="busy" data-mode="blitz" @click="game.mode !== 'blitz' && requestNewGame('blitz')"><SvgIcon name="bolt" /> Блиц <span>90 секунд</span></button>
+
+      <div class="play-layout">
+        <section class="arena" aria-label="Барабаны и FIFO-карусель">
+          <div class="arena-top"><div class="table-label"><span class="live-dot" /> СТОЛ № 01 <span class="table-divider">/</span> <span>DOMINO POKER</span></div><button class="text-button" :disabled="!!busy" title="Сохранить анализ текущей сессии и начать новую: 50 Roll и 12 дайсов" @click="requestNew"><SvgIcon name="roll" /> Новая игра</button></div>
+          <div class="table-body">
+            <div class="machine">
+              <MatchConnections v-if="!busy" :matches="board.matches" :upper="game.upper" />
+              <div class="row-heading"><span><b>01</b> ВЕРХНИЕ БАРАБАНЫ</span><span title="Нажми любую пару: 1 Roll фиксации стоит 1 дайс, 3 Roll — 3 дайса."><SvgIcon name="unlock" /> Нажми, чтобы закрепить</span></div>
+              <div class="upper-strip" aria-label="Верхние барабаны">
+                <DominoTile v-for="(tile, index) in (visualUpper || game.upper)" :key="index" :tile="tile" row="upper" :index="index" :matched="!busy && isMatched('upper', index)" :paid="game.awardedUpperIds.includes(tile.id)" :active="selectedCell?.row === 'upper' && selectedCell.index === index" :busy="!!busy || game.phase === 'finished'" :rolling="busy === 'roll'" @select="selectCell" />
+              </div>
+              <div class="control-bridge">
+                <button id="roll-button" :class="['roll-button', { 'is-rolling': busy === 'roll' }]" :disabled="!canRoll" :title="rollTitle" @click="perform('roll')"><SvgIcon name="roll" /><span>{{ busy === 'roll' ? 'Крутим…' : 'Roll the Dice' }}<small>−1 Roll <i>·</i> +6 дайсов</small></span><kbd>R</kbd></button>
+                <div class="bridge-stat" title="Оставшиеся полные прокрутки верхних барабанов. Один Roll обновляет все незакреплённые пары и добавляет 6 дайсов."><span>ROLLS LEFT</span><strong id="rolls-left">{{ game.rollsLeft }}<small>/ 50</small></strong></div>
+                <div class="bridge-stat" title="Дайсы — внутриигровые единицы для Drop и фиксаций. Drop стоит 1 дайс. Каждый Roll добавляет 6 дайсов."><span>DICE DROPS</span><strong id="dice-credits">{{ game.diceCredits }}<small>дайсов</small></strong></div>
+              </div>
+              <div class="row-heading lower-heading"><span><b>02</b> НИЖНЯЯ КАРУСЕЛЬ <span class="fifo-tag">FIFO</span></span><button id="auto-flow" :class="['auto-flow-button', { active: autoFlow }]" :aria-pressed="autoFlow" :disabled="!!busy || game.phase === 'finished'" title="Автопоток: один FIFO Drop каждые 5 секунд за 1 дайс. В скрытой вкладке, открытом окне и при выборе фиксации ждёт. Золотые кости позволяют сделать Drop вручную в любой момент. Нажми, чтобы включить или остановить." @click="toggleAutoFlow"><span />{{ autoFlow ? 'Автопоток · вкл' : 'Автопоток' }}</button></div>
+              <div class="carousel-viewport">
+                <TransitionGroup name="fifo" tag="div" class="lower-strip" aria-label="Нижняя FIFO-карусель">
+                  <DominoTile v-for="(tile, index) in game.lower" :key="tile.id" :tile="tile" row="lower" :index="index" :matched="!busy && isMatched('lower', index)" :active="selectedCell?.row === 'lower' && selectedCell.index === index" :busy="!!busy || game.phase === 'finished'" @select="selectCell" />
+                </TransitionGroup>
+              </div>
+              <div class="carousel-track" aria-hidden="true"><span>← OUT</span><span>ПОТОК НЕ ОСТАНАВЛИВАЕТСЯ</span><span>IN ←</span></div>
             </div>
-            <button id="restart" class="restart-button" title="Начать новую игру" :disabled="busy" @click="requestNewGame()"><SvgIcon name="roll" /><span>Заново</span></button>
+            <aside class="table-side">
+              <div class="score-display" title="Общие очки этой сессии. Новая совпавшая верхняя фишка даёт 25 очков плюс бонус лучшей комбинации. Уже оплаченное совпадение повторно не оплачивается."><span class="eyebrow">ТВОЙ СЧЁТ</span><strong id="total-score">{{ format(game.total) }}</strong><span v-if="lastGain" class="score-gain">+{{ format(lastGain) }} за ход</span><span v-else class="score-subtitle">Каждая пара — возможность</span><div class="personal-best"><SvgIcon name="cup" /> Рекорд <b>{{ format(bestScore) }}</b></div></div>
+              <div class="drop-area"><span class="drop-kicker">ОДИН МАЛЕНЬКИЙ СДВИГ</span><GoldenDiceButton :disabled="!canDrop" :busy="busy === 'drop'" :credits="game.diceCredits" :title="dropTitle" @click="perform('drop')" /><span class="drop-key"><kbd>D</kbd> или нажми на золотые кости</span></div>
+            </aside>
           </div>
-          <div id="game-table" :class="['game-table', { 'bust-flash': bustFlash }]">
-            <div class="table-top">
-              <div class="round-display"><span>{{ game.mode === 'blitz' ? 'НА ТАЙМЕРЕ' : 'РАУНД' }}</span><strong><span id="round-number" :style="{ color: urgent ? '#f0ba8f' : '' }">{{ game.mode === 'blitz' ? time : String(game.round).padStart(2, '0') }}</span><small v-if="game.mode === 'classic'"> / 10</small></strong></div>
-              <div class="round-bank"><span>НА КОНУ В РАУНДЕ</span><div><strong id="round-score">{{ format(prospective) }}</strong><span class="points-label">очков</span></div></div>
-              <div class="risk-status" :style="{ color: game.phase === 'rolled' && chance >= 40 ? '#edc094' : '' }"><span class="live-dot" /><span>{{ riskText }}</span></div>
-            </div>
-            <div class="table-decor decor-one">✳</div><div class="table-decor decor-two">+</div>
-            <div id="dice-stage" :class="['dice-stage', { rolling: busy }]" aria-label="Кости">
-              <GameDie v-for="(value, index) in (visualDice || game.dice)" :key="index" :value="value" :index="index" :held="heldDice.includes(index)" :selected="!busy && game.selected.includes(index)" :disabled="busy || game.phase !== 'rolled'" @select="toggleDie" />
-            </div>
-            <div class="table-message" aria-live="polite"><div class="message-title">{{ messages.title }}</div><p>{{ messages.text }}</p></div>
-            <div class="selection-strip"><span class="selection-dot" /><span>{{ messages.selection }}</span><strong v-if="validSelection && !busy">+{{ format(selection.points) }}</strong></div>
-            <div class="table-bottom"><span>THE DICE ARE IN YOUR HANDS</span><span class="mini-brand">D’R <SvgIcon name="dice" /></span></div>
+          <div class="result-strip" aria-live="polite"><span :class="['result-mark', { won: lastGain }]">{{ lastGain ? '✦' : '↗' }}</span><div><strong>{{ busy ? busy === 'roll' ? 'Барабаны крутятся. Лови момент.' : 'Маленький сдвиг — новые возможности.' : game.phase === 'finished' ? 'Сессия сохранена. Посмотри, как ты играл.' : lastResult?.type === 'ready' ? 'Три верхние пары уже совпали. Попробуем поймать новые?' : lastGain ? `${lastResult?.combo?.label} · +${format(lastGain)} очков` : 'Не в этот ход. Что изменишь дальше?' }}</strong><span>{{ board.cards.length }} из 6 верхних фишек совпадают с нижним рядом <i>·</i> {{ board.combo.label }}</span></div><button class="text-button" title="Показать все поддерживаемые комбинации и начисляемые бонусы" @click="modal = 'combinations'">Комбинации <SvgIcon name="arrow" /></button></div>
+          <div v-if="selectedCell && activeTile" class="lock-popover" role="region" aria-label="Фиксация ячейки">
+            <div class="lock-popover-heading"><SvgIcon name="lock" /><div><strong>{{ selectedCell.row === 'upper' ? 'Барабан' : 'Нижняя ячейка' }} {{ selectedCell.index + 1 }} · {{ activeTile.a }} : {{ activeTile.b }}</strong><span>{{ activeTile.lockRemaining ? `Осталось ${activeTile.lockRemaining} ${selectedCell.row === 'upper' ? 'Roll' : 'Drop'}` : 'Сохрани фишку, пока меняются остальные' }}</span></div><button class="icon-button" title="Закрыть выбор фиксации" aria-label="Закрыть фиксацию" @click="selectedCell = null"><SvgIcon name="close" /></button></div>
+            <div v-if="!activeTile.lockRemaining" class="lock-offers"><button v-for="offer in lockOptions" :key="offer.duration" :disabled="game.diceCredits < offer.cost" :title="`${offer.label}: ${offer.cost} ${offer.cost === 1 ? 'дайс' : 'дайса'} списываются сразу. ${selectedCell.row === 'upper' ? 'Срок уменьшается только от Roll; Drop не расходует фиксацию.' : 'Ячейка остаётся на месте. Срок уменьшается только от Drop; Roll не расходует фиксацию.'}`" @click="purchaseLock(offer.duration)"><span>{{ offer.label }}</span><b>−{{ offer.cost }} {{ offer.cost === 1 ? 'дайс' : 'дайса' }}</b></button></div><button v-else class="release-button" title="Снять фиксацию бесплатно. Потраченные дайсы не возвращаются." @click="releaseLock">Освободить бесплатно <SvgIcon name="unlock" /></button>
           </div>
-          <div class="action-panel">
-            <button id="roll-button" ref="rollButton" class="roll-button" :disabled="busy || (game.phase === 'rolled' && !validSelection)" @click="roll"><SvgIcon name="dice" /><span>{{ rollLabel }}</span><kbd>SPACE</kbd></button>
-            <button id="bank-button" class="bank-button" :disabled="busy || !validSelection" @click="bank"><span>{{ validSelection ? `Забрать ${format(prospective)}` : 'Забрать очки' }}</span><SvgIcon name="arrow" /></button>
-          </div>
-          <div class="under-actions"><span><span class="keyboard-symbol">⌨</span> <kbd>1–6</kbd> выбрать кости <i>·</i> <kbd>Enter</kbd> забрать</span><span>{{ game.rolls ? `Бросков за игру: ${game.rolls}` : 'Твой следующий любимый перерыв' }}</span></div>
-          <section class="combo-section">
-            <div class="section-title"><h2>Знакомься, твои счастливые комбинации</h2><button @click="modal = 'rules'">Все правила <SvgIcon name="arrow" /></button></div>
-            <div class="combo-grid">
-              <div class="combo-card"><div class="combo-visual"><span class="tiny-die"><DieFace :value="1" /></span></div><div><strong>Единица</strong><span>Маленькое начало</span></div><b>100</b></div>
-              <div class="combo-card"><div class="combo-visual"><span class="tiny-die"><DieFace :value="5" /></span></div><div><strong>Пятёрка</strong><span>Тоже приятно</span></div><b>50</b></div>
-              <div class="combo-card"><div class="combo-visual triple"><span v-for="i in 3" :key="i" class="tiny-die"><DieFace :value="3" /></span></div><div><strong>Три одинаковых</strong><span>Вот это уже комбо</span></div><b>×100</b></div>
-            </div>
-          </section>
         </section>
-        <aside class="session-column">
-          <section class="score-card">
-            <div class="card-eyebrow"><span>ТВОЯ ИГРА</span><span class="session-dot">●</span></div><span class="total-label">Общий счёт</span><div id="total-score" class="total-score">{{ format(game.total) }}</div>
-            <div class="score-goal"><span>{{ game.total < 1000 ? 'Разогрев до' : 'Следующая цель:' }} {{ format(goal) }}</span><span>{{ progress }}%</span></div><div class="progress-track"><div :style="{ width: `${progress}%` }" /></div>
-            <div class="session-stats"><div><span>Лучший раунд</span><strong>{{ game.bestRound ? format(game.bestRound) : '—' }}</strong></div><div><span>Удачных бросков</span><strong>{{ game.successful }}</strong></div></div>
+
+        <aside class="insights-column">
+          <section class="ardor-card">
+            <div class="insight-heading"><span class="eyebrow">ARDOR INDEX</span><SvgIcon name="flame" /></div><h2>Измерь свой <em>азарт.</em></h2>
+            <div class="ardor-reading" :title="`Ardor = (1 − P) × 100. P — точная вероятность цели «${selectedTarget.label}» на следующий ${probabilityAction === 'roll' ? 'Roll' : 'Drop'}, с учётом всех фиксаций и уже оплаченных совпадений. Это сложность выбранной цели, а не оценка личности.`"><strong id="ardor-index">{{ ardor.toFixed(1) }}</strong><span>/ 100</span></div>
+            <div class="ardor-gauge" title="Чем меньше шанс выбранной цели, тем выше Ardor Index"><span :style="{ width: `${ardor}%` }" /></div><div class="gauge-labels"><span>Спокойнее</span><span>Рискованнее</span></div>
+            <label class="target-label" for="probability-target">ЧТО ХОЧЕШЬ ПОЙМАТЬ?</label><select id="probability-target" :value="game.target" :disabled="!!busy || game.phase === 'finished'" :title="selectedTarget.description + ' Выбор цели меняет расчёт шанса; очки всё равно начисляются за все новые совпадения.'" @change="changeTarget($event.target.value)"><option v-for="target in PROBABILITY_TARGETS" :key="target.id" :value="target.id">{{ target.label }}</option></select>
+            <div class="probability-tabs" role="group" aria-label="Для какого хода считать вероятность"><button :class="{ active: probabilityAction === 'roll' }" title="Точная вероятность выбранной цели при следующем Roll" @click="probabilityAction = 'roll'">Следующий Roll</button><button :class="{ active: probabilityAction === 'drop' }" title="Точная вероятность выбранной цели при следующем FIFO Drop" @click="probabilityAction = 'drop'">Следующий Drop</button></div>
+            <div class="chance-line" :title="selectedTarget.description + ' Вероятность вычисляется из всех возможных исходов. Считается наличие комбинации, а не её исключительный старший класс; требуется хотя бы одно новое совпадение.'"><span>Шанс цели</span><strong id="target-chance">{{ percent(chosenProbability) }}</strong></div><div class="chance-line subtle" title="Вероятность хотя бы одного нового совпадения независимо от выбранной покерной цели"><span>Любое новое совпадение</span><span>{{ percent(rawProbability) }}</span></div><p class="odds-note">Не предсказание. Математика<br>твоего следующего решения.</p>
           </section>
-          <section class="risk-card"><div class="risk-card-icon">✳</div><div class="eyebrow">МАЛЕНЬКИЙ СОВЕТ</div><h2>Жадность —<br>тоже стратегия<span>.</span></h2><p>{{ tip }}</p><div class="risk-card-footer"><span>Чувствуешь этот азарт?</span><SvgIcon name="arrow" /></div></section>
-          <section class="history-card">
-            <div class="section-title"><h2>Последние раунды</h2><span>{{ game.mode === 'classic' ? `${game.history.length} / 10` : `${game.history.length} раундов` }}</span></div>
-            <div id="round-history">
-              <template v-if="game.history.length"><div v-for="round in game.history.slice(-3).reverse()" :key="round.round" :class="['history-row', { bust: round.bust }]"><span class="history-index">{{ String(round.round).padStart(2, '0') }}</span><span class="history-name">{{ round.bust ? 'Не в этот раз' : round.points >= 1000 ? 'Мощный раунд' : 'В копилку' }}</span><strong>{{ round.bust ? '0' : '+' + format(round.points) }}</strong></div></template>
-              <div v-else class="history-empty"><div class="history-empty-dice"><SvgIcon name="dice" /></div><p>Пока чистый лист</p><span>Самое интересное впереди</span></div>
-            </div>
-          </section>
+          <section class="move-card"><div class="insight-heading"><span class="eyebrow">МАЛЕНЬКАЯ СТРАТЕГИЯ</span><span>✳</span></div><h3>Не всё нужно<br>менять сразу.</h3><p>Закрепи нужную фишку. Один Drop стоит в шесть раз меньше полного Roll — и сохраняет пять известных пар.</p><div><span title="1 Roll даёт 6 дайсов. 1 Drop стоит 1 дайс. Фиксации покупаются из того же запаса.">1 ROLL <SvgIcon name="arrow" /> 6 ДАЙСОВ</span><SvgIcon name="lock" /></div></section>
         </aside>
       </div>
-      <footer><span>Сделано для «ну ещё один раз».</span><span><span class="footer-dot" /> Никаких ставок. Только твой рекорд.</span><span>DICE’N’ROLL © 2026</span></footer>
+
+      <section class="bottom-panels">
+        <div class="combination-panel"><div class="section-heading"><div><span class="eyebrow">СОВПАЛО? СОБИРАЙ ДАЛЬШЕ.</span><h2>Знакомые комбинации. Новая игра.</h2></div><button class="text-button" title="Показать все 13 комбинаций покера костей и точные условия" @click="modal = 'combinations'">Все 13 <SvgIcon name="arrow" /></button></div><div class="combo-shortlist"><button v-for="combo in COMBINATIONS.filter(c => ['pair','straight','full-house','royal'].includes(c.id))" :key="combo.id" :disabled="!!busy || game.phase === 'finished'" :title="combo.description + ` Бонус +${combo.bonus} очков, если на ходу есть новое совпадение.`" @click="changeTarget(combo.id)"><span class="combo-mini-symbol">{{ combo.id === 'pair' ? 'Ⅱ' : combo.id === 'straight' ? '↗' : combo.id === 'full-house' ? 'ⅢⅡ' : '♛' }}</span><strong>{{ combo.label }}</strong><span>+{{ format(combo.bonus) }}</span></button></div></div>
+        <div class="session-mini"><div class="section-heading"><div><span class="eyebrow">КАЖДОЕ РЕШЕНИЕ ИМЕЕТ СЛЕД</span><h2>Твоя сессия в цифрах</h2></div><button class="icon-button" title="Открыть подробную сводку текущих игровых решений" @click="showAnalysis"><SvgIcon name="chart" /></button></div><div class="session-mini-stats"><div title="Сколько раз ты полностью прокрутил незакреплённые верхние барабаны"><b>{{ game.rolls }}</b><span>Roll</span></div><div title="Сколько раз ты сдвинул FIFO-карусель"><b>{{ game.drops }}</b><span>Drop</span></div><div title="Сколько платных фиксаций было куплено за эту сессию"><b>{{ game.locksPurchased }}</b><span>Фиксаций</span></div><div title="Дайсы, потраченные на фиксации за всю сессию"><b>{{ game.spentOnLocks }}</b><span>На удержание</span></div></div></div>
+      </section>
+      <footer><span>Dice’n’Roll <i>·</i> «А если ещё раз?»</span><span title="Все очки и дайсы — внутриигровые. История хранится только в браузере.">Локальная история. Твой собственный ритм.</span><button class="text-button" title="Скачать JSON с полным доступным журналом и анализом текущей сессии" @click="exportLog"><SvgIcon name="save" /> Экспорт сессии</button></footer>
     </main>
   </div>
 
   <GameModal :open="!!modal" @close="modal = ''">
-    <template v-if="modal === 'rules'">
-      <h2 id="modal-title">Удача любит<br>ещё один бросок<span class="accent">.</span></h2><p>Собери больше очков за 10 раундов. Или выбери блиц и успей за 90 секунд.</p>
-      <div class="rules-steps">
-        <div class="rule-step"><span class="step-number">1</span><div><strong>Бросай и выбирай</strong><p>Единицы, пятёрки и от трёх одинаковых приносят очки. Лучшая комбинация выделяется автоматически — её можно изменить кликом.</p></div></div>
-        <div class="rule-step"><span class="step-number">2</span><div><strong>Забрать или рискнуть?</strong><p>Забери очки в общий счёт и начни новый раунд. Или оставь выбранные кости и брось остальные, чтобы увеличить очки раунда.</p></div></div>
-        <div class="rule-step"><span class="step-number">3</span><div><strong>Пустой бросок = всё сгорело</strong><p>Нет комбинаций? Очки текущего раунда пропадают. Сохранённый общий счёт остаётся. Если все шесть костей дали очки, можно бросить их все снова!</p></div></div>
-      </div>
-      <div class="rules-table"><span>Каждая единица / пятёрка</span><b>100 / 50</b><span>Три одинаковых 2–6</span><b>число × 100</b><span>Три единицы</span><b>1 000</b><span>Каждая следующая одинаковая</span><b>удваивает тройку</b><span>Стрит 1–6 / три пары</span><b>1 500</b></div>
-      <p class="rules-note">Комбинации собираются в пределах одного броска. В блице таймер идёт и при открытых правилах; по окончании незабранные очки сгорают. Звук: кнопка динамика в меню или клавиша M.</p><button class="modal-primary" @click="modal = ''">Понятно. Погнали!</button>
-    </template>
-    <template v-else-if="modal === 'records'">
-      <h2 id="modal-title">Твоя полоса удачи<span class="accent">.</span></h2><p>{{ game.mode === 'classic' ? 'Классика · 10 раундов' : 'Блиц · 90 секунд' }} · Личные рекорды в этом браузере</p>
-      <template v-if="recordList.length"><div v-for="(record, i) in recordList" :key="`${record.date}-${i}`" class="record-item"><span class="rank">{{ i + 1 }}</span><div><p>{{ i === 0 ? 'Планка, которую стоит поднять' : 'Хорошая была игра' }}</p><small>{{ recordDate(record.date) }}</small></div><strong>{{ format(record.score) }}</strong></div></template>
-      <div v-else class="results-hero"><div class="results-icon">✧</div><p>Первый рекорд пока ждёт тебя.<br>Закончи игру — и он появится здесь.</p></div>
-      <button class="modal-primary" @click="modal = ''">Вернуться к костям</button>
-    </template>
-    <template v-else-if="modal === 'confirm'">
-      <h2 id="modal-title">{{ pendingMode !== game.mode ? 'Сменим темп?' : 'Начнём с чистого листа?' }}</h2><p>Текущая игра завершится без сохранения в рекорды. Начать {{ pendingMode === 'classic' ? 'классическую игру на 10 раундов' : 'блиц на 90 секунд' }}?</p><button id="confirm-new" class="modal-primary" @click="newGame(pendingMode)">Начать новую игру</button><button class="modal-secondary" @click="modal = ''">Продолжить текущую</button>
-    </template>
-    <template v-else-if="modal === 'results'">
-      <div class="results-hero"><div class="results-icon"><SvgIcon name="cup" /></div><h2 id="modal-title">{{ game.total >= 3000 ? 'Удача тебя запомнит.' : 'Ну как тут остановиться?' }}</h2><p>{{ game.mode === 'blitz' ? 'Время вышло' : 'Все 10 раундов позади' }}. Вот твой результат:</p><div class="results-score">{{ format(game.total) }}</div><span class="eyebrow results-caption">ОЧКОВ В КОПИЛКЕ</span><div v-if="newRecord" class="new-record">✦ Новый личный рекорд!</div><div class="results-details"><div><strong>{{ format(game.bestRound) }}</strong><span>ЛУЧШИЙ РАУНД</span></div><div><strong>{{ game.successful }}</strong><span>УДАЧНЫХ БРОСКОВ</span></div></div></div>
-      <button class="modal-primary" @click="newGame()">Ну ещё один раз <SvgIcon name="arrow" /></button><button class="modal-secondary" @click="modal = 'records'">Посмотреть рекорды</button>
-    </template>
+    <template v-if="modal === 'rules'"><span class="modal-kicker">ДВА ДВИЖЕНИЯ. МНОГО ВОЗМОЖНОСТЕЙ.</span><h2 id="modal-title">Лови связь между<br>верхом и низом.</h2><div class="rules-steps"><div><b>01</b><section><h3>Roll — меняет верх</h3><p>Все незакреплённые верхние пары крутятся барабаном. Цена — 1 Roll из 50. За него получаешь 6 дайсов.</p></section></div><div><b>02</b><section><h3>Drop — двигает низ</h3><p>За 1 дайс первая свободная пара уходит влево. Остальные сохраняют порядок, новая появляется в последней свободной ячейке справа. Закреплённые нижние ячейки стоят на месте.</p></section></div><div><b>03</b><section><h3>Фиксация — покупает время</h3><p>Нажми фишку: верх можно удержать на 1 / 3 Roll за 1 / 3 дайса, низ — на 3 / 6 Drop за 2 / 4 дайса. Освободить можно бесплатно, без возврата потраченного.</p></section></div><div><b>04</b><section><h3>Совпадения — собирают покер</h3><p>Два одинаковых числа между рядами совпадают в любом порядке и в любых столбцах. Каждая новая совпавшая верхняя фишка даёт 25 очков. Из её верхнего числа и масти собирается лучшая комбинация, которая добавляет бонус. Уже оплаченное совпадение повторно не оплачивается.</p></section></div></div><p>Масти нужны только для покера. У костей числа 1–6: «роял-стрит» — костяной аналог роял-флеша, 2–3–4–5–6 одной масти. Полный стрит — все числа 1–6.</p><p>Ardor = (1 − точный шанс выбранной цели) × 100. Чем редче цель следующего хода, тем выше индекс. При выходе сохраняются журнал и сводка; при возврате можно продолжить.</p><button class="modal-primary" title="Закрыть краткие правила и вернуться к игре" @click="modal = ''">Понятно. Погнали <SvgIcon name="arrow" /></button></template>
+    <template v-else-if="modal === 'combinations'"><span class="modal-kicker">ПОКЕР КОСТЕЙ</span><h2 id="modal-title">От пары до<br>шести одинаковых.</h2><p>Считаются только совпавшие верхние фишки. Все новые совпадения дают по 25 очков плюс один бонус самой сильной комбинации. Для выплаты на этом ходу нужно новое совпадение.</p><div class="all-combinations"><div v-for="combo in COMBINATIONS" :key="combo.id" :title="combo.description"><div><strong>{{ combo.label }}</strong><p>{{ combo.description }}</p></div><b>{{ combo.bonus ? '+' + format(combo.bonus) : '25 / фишка' }}</b></div></div><button class="modal-primary" title="Вернуться к игровому столу" @click="modal = ''">Обратно к костям</button></template>
+    <template v-else-if="modal === 'records'"><span class="modal-kicker">СОХРАНЕНО В ЭТОМ БРАУЗЕРЕ</span><h2 id="modal-title">У каждого азарта<br>своя история.</h2><p>Последние 20 сессий. Открытая сессия обновляется после ходов и при выходе.</p><div v-if="!history.length" class="empty-history">Сделай первый ход — и здесь появится твоя история.</div><button v-for="item in history" :key="item.sessionId" class="history-session" :title="`Открыть анализ: ${item.label}. ${item.rolls} Roll, ${item.drops} Drop, ${item.score} очков.`" @click="viewSession(item)"><span class="history-symbol"><SvgIcon :name="item.final ? 'cup' : 'dice'" /></span><span><strong>{{ item.label }}</strong><small>{{ dateLabel(item.startedAt) }} <i>·</i> {{ item.final ? 'Завершена' : 'Сохранена' }}</small></span><b>{{ format(item.score) }}</b><SvgIcon name="arrow" /></button><button class="modal-primary" title="Закрыть историю сессий" @click="modal = ''">Продолжить игру</button></template>
+    <template v-else-if="modal === 'finish' || modal === 'new'"><span class="modal-kicker">ТОЧКА ТОЖЕ БЫВАЕТ КРАСИВОЙ</span><h2 id="modal-title">{{ modal === 'new' ? 'Начнём новую историю?' : 'Посмотрим, как ты играл?' }}</h2><p>Сохраним {{ format(game.total) }} очков, все доступные ходы и анализ этой сессии. {{ modal === 'new' ? 'Новая игра начнётся с 50 Roll и 12 дайсами.' : 'После завершения этот стол останется в истории.' }}</p><button id="confirm-finish" class="modal-primary" title="Завершить текущую сессию и сохранить её в локальную историю" @click="modal === 'new' ? startNew() : finish()">{{ modal === 'new' ? 'Сохранить и начать новую' : 'Завершить и открыть анализ' }} <SvgIcon name="arrow" /></button><button class="modal-secondary" title="Вернуться к игре, не завершая сессию" @click="modal = ''">Я ещё поиграю</button></template>
+    <template v-else-if="modal === 'analysis' && analysis"><span class="modal-kicker">ТВОЙ ИГРОВОЙ ПОЧЕРК</span><h2 id="modal-title">{{ analysis.label }}<span class="accent">.</span></h2><p>{{ analysis.description }}</p><p v-if="analysis.automaticDrops" class="analysis-auto-note">Автопоток: {{ analysis.automaticDrops }} из {{ analysis.drops }} Drop. Автоматические ходы отдельно помечены в журнале.</p><div class="analysis-score"><strong>{{ format(analysis.score) }}</strong><span>ОЧКОВ <i>·</i> {{ duration(analysis.durationMs) }}</span></div><div class="analysis-grid"><div title="Доля ходов Roll и Drop, за которые начислены очки"><b>{{ percent(analysis.hitRate) }}</b><span>Удачных ходов</span></div><div title="Средний Ardor перед сделанными ходами. Это сложность выбранных целей, а не психологическая оценка"><b>{{ Number(analysis.meanArdor).toFixed(1) }}</b><span>Средний Ardor</span></div><div><b>{{ analysis.rolls }} / {{ analysis.drops }}</b><span>Roll / Drop</span></div><div><b>{{ analysis.lockCount }}</b><span>Куплено фиксаций</span></div><div><b>{{ analysis.spentOnLocks }}</b><span>Дайсов на удержание</span></div><div><b>{{ analysis.longestDryStreak }}</b><span>Ходов без выигрыша подряд</span></div></div><div v-if="Object.keys(analysis.combinationCounts || {}).length" class="analysis-combos"><span class="eyebrow">ЧТО УДАЛОСЬ СОБРАТЬ</span><span v-for="(count, id) in analysis.combinationCounts" :key="id">{{ comboLabel(id) }} <b>×{{ count }}</b></span></div><p class="analysis-note">Сводка описывает решения этой сессии. Журнал содержит до 500 последних событий. Подробные журналы трёх последних сессий хранятся отдельно; сводная статистика охватывает все ходы.</p><button class="modal-secondary" :disabled="!hasAnalysisLog" :title="hasAnalysisLog ? 'Скачать журнал и анализ этой сессии ' : 'Подробный журнал заменён более новыми; сводка сохранена'" @click="exportLog"><SvgIcon name="save" /> Скачать журнал JSON</button><button class="modal-primary" title="Вернуться к текущей игре или начать новую, если сессия завершена" @click="game.phase === 'finished' ? startNew() : modal = ''">{{ game.phase === 'finished' ? 'Новая сессия' : 'Вернуться к игре' }} <SvgIcon name="arrow" /></button></template>
   </GameModal>
-  <div id="toast" :class="['toast', { show: toastMessage }]" role="status">{{ toastMessage }}</div>
-  <div id="confetti" aria-hidden="true"><span v-for="piece in confetti" :key="piece.id" class="confetto" :style="piece.style" /></div>
+  <div id="toast" :class="['toast', { show: toastMessage }]" role="status">{{ toastMessage }}</div><div id="confetti" aria-hidden="true"><span v-for="piece in confetti" :key="piece.id" class="confetto" :style="piece.style" /></div>
 </template>

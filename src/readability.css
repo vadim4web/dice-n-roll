@@ -1,0 +1,120 @@
+/* Keep compact table labels legible while retaining all six visible columns. */
+.auto-flow-button { display: inline-flex; align-items: center; gap: 5px; font-size: 8px; color: #c9ad89; background: transparent; padding: 2px 0 3px 5px; white-space: nowrap; }
+.auto-flow-button > span { height: 5px; width: 5px; border-radius: 50%; border: 1px solid #b69773; }
+.auto-flow-button.active { color: #b6e2b7; }
+.auto-flow-button.active > span { background: #8bd5aa; border-color: #8bd5aa; box-shadow: 0 0 0 3px #8bd5aa12; }
+.header-caption { font-size: 9px; }
+.quiet-button, .text-button { font-size: 11px; }
+.hero .eyebrow { font-size: 9px; }
+.save-status { font-size: 10px; }
+.hero-right .text-button { font-size: 11px; }
+.table-label { font-size: 9px; }
+.table-label > span:last-child { font-size: 8px; }
+.arena-top .text-button { font-size: 10px; }
+.row-heading { font-size: 9px; }
+.row-heading > span:last-child { font-size: 8px; }
+.row-heading b { font-size: 8px; }
+.slot-caption, .slot-caption > span:first-child { font-size: 7px; }
+.match-caption { font-size: 6px !important; }
+.slot-lock { font-size: 8px; }
+.roll-button > span { font-size: 14px; }
+.roll-button small { font-size: 8px; }
+.bridge-stat > span { font-size: 8px; }
+.bridge-stat small { font-size: 8px; }
+.carousel-track { font-size: 7px; }
+.carousel-track > span:nth-child(2) { font-size: 6px; }
+.score-display .eyebrow { font-size: 9px; }
+.score-subtitle, .personal-best { font-size: 9px; }
+.drop-kicker { font-size: 7px; }
+.drop-key { font-size: 7px; }
+.result-strip strong { font-size: 11px; }
+.result-strip > div > span { font-size: 9px; }
+.result-strip > .text-button { font-size: 9px; }
+.insight-heading .eyebrow { font-size: 9px; }
+.target-label { font-size: 8px; }
+.probability-tabs button { font-size: 9px; }
+.chance-line { font-size: 11px; }
+.chance-line.subtle { font-size: 8px; }
+.chance-line.subtle > span:last-child { font-size: 10px; }
+.odds-note { font-size: 9px; }
+.gauge-labels { font-size: 8px; }
+.move-card .insight-heading .eyebrow { font-size: 8px; }
+.move-card p { font-size: 11px; }
+.move-card > div:last-child > span { font-size: 8px; }
+.section-heading .eyebrow { font-size: 8px; }
+.combo-shortlist strong { font-size: 10px; }
+.combo-shortlist button > span:last-child { font-size: 9px; }
+.session-mini-stats span { font-size: 9px; }
+footer, footer .text-button { font-size: 9px; }
+.lock-popover-heading > div > span { font-size: 10px; }
+
+@media (max-width: 1250px) and (min-width: 901px) {
+  .row-heading { font-size: 8px; }
+  .row-heading > span:last-child { font-size: 6px; }
+  .slot-lock { font-size: 7px; }
+  .slot-caption { font-size: 6px; }
+  .match-caption { font-size: 5px !important; }
+  .roll-button > span { font-size: 11px; }
+  .roll-button small { font-size: 7px; }
+  .bridge-stat > span { font-size: 6px; }
+  .bridge-stat small { font-size: 7px; }
+  .score-subtitle, .personal-best { font-size: 7px; }
+  .drop-kicker, .drop-key { font-size: 5px; }
+  .probability-tabs button { font-size: 7px; }
+  .chance-line.subtle { font-size: 7px; }
+  .move-card .insight-heading .eyebrow { font-size: 7px; }
+  .move-card p { font-size: 10px; }
+  .combo-shortlist strong { font-size: 8px; }
+}
+@media (max-width: 720px) {
+  .quiet-button, .hero-right .text-button { font-size: 9px; }
+  .hero .eyebrow { font-size: 7px; }
+  .save-status { font-size: 8px; }
+  .table-label, .arena-top .text-button { font-size: 8px; }
+  .table-label > span:last-child { font-size: 6px; }
+  .row-heading { font-size: 7px; }
+  .row-heading > span:last-child { font-size: 6px; }
+  .row-heading b { font-size: 6px; }
+  .slot-caption, .slot-caption > span:first-child { font-size: 6px; }
+  .match-caption { font-size: 4px !important; }
+  .slot-lock { font-size: 6px; }
+  .roll-button > span { font-size: 11px; }
+  .roll-button small { font-size: 7px; }
+  .bridge-stat > span { font-size: 6px; }
+  .bridge-stat small { font-size: 7px; }
+  .carousel-track { font-size: 6px; }
+  .carousel-track > span:nth-child(2) { font-size: 5px; }
+  .score-subtitle, .personal-best { font-size: 7px; }
+  .drop-kicker, .drop-key { font-size: 5px; }
+  .result-strip strong { font-size: 10px; }
+  .result-strip > div > span { font-size: 7px; }
+  .result-strip > .text-button { font-size: 7px; }
+  .target-label { font-size: 7px; }
+  .probability-tabs button { font-size: 7px; }
+  .chance-line { font-size: 9px; }
+  .chance-line.subtle { font-size: 7px; }
+  .chance-line.subtle > span:last-child { font-size: 8px; }
+  .gauge-labels { font-size: 6px; }
+  .move-card .insight-heading .eyebrow { font-size: 7px; }
+  .move-card p { font-size: 9px; }
+  .section-heading .eyebrow { font-size: 7px; }
+  .session-mini-stats span { font-size: 8px; }
+  footer, footer .text-button { font-size: 7px; }
+}
+@media (max-width: 560px) {
+  .auto-flow-button { font-size: 7px; gap: 4px; }
+  .hero .eyebrow { font-size: 6px; letter-spacing: .5px; }
+  .save-status { font-size: 6px; }
+  .hero-right .text-button { font-size: 7px; }
+  .row-heading { font-size: 7px; letter-spacing: .4px; }
+  .row-heading > span:last-child { font-size: 5px; }
+  .slot-caption, .slot-caption > span:first-child { font-size: 5px; }
+  .slot-caption { letter-spacing: 0; }
+  .match-caption { font-size: 3.5px !important; }
+  .slot-lock { font-size: 5.5px; gap: 1px; }
+  .slot-lock svg { width: 6px; height: 6px; }
+  .result-strip > .text-button { font-size: 0; }
+  .target-label { font-size: 6px; }
+  .chance-line.subtle { font-size: 6px; }
+  .combo-shortlist strong { font-size: 10px; }
+}

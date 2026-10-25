@@ -17,7 +17,7 @@ onBeforeUnmount(() => { if (dialog.value?.open) dialog.value.close(); });
 </script>
 <template>
   <dialog id="modal" ref="dialog" aria-labelledby="modal-title" @cancel.prevent="$emit('close')" @close="$emit('close')" @click="outside">
-    <div class="modal-header"><span class="eyebrow">DICE’N’ROLL</span><button class="icon-button" aria-label="Закрыть" @click="$emit('close')"><SvgIcon name="close" /></button></div>
+    <div class="modal-header"><span class="eyebrow">DICE’N’ROLL</span><button class="icon-button" aria-label="Закрыть" title="Закрыть окно и вернуться к игровому столу" @click="$emit('close')"><SvgIcon name="close" /></button></div>
     <div id="modal-content"><slot /></div>
   </dialog>
 </template>

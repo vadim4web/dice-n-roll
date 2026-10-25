@@ -11,4 +11,8 @@
     <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 2c1 6-5 7-5 12a5 5 0 0 0 10 0c0-2-1-4-2-5 0 3-2 4-2 4 1-5-1-8-1-11Z"/></symbol>
     <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
     <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1Z"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/></symbol>
+    <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 7-2m-3 10v2"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20h17M5 15l5-5 4 3 7-9M5 20v-2m5 2v-5m5 5v-3m5 3V9"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 3h12l4 4v14H3V3h2Zm2 0v6h10V3M7 21v-8h10v8"/></symbol>
   </defs></svg></template>

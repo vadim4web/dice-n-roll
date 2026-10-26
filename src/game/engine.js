@@ -5,25 +5,26 @@ export const SUITS = [
   { id: 3, symbol: '♦', name: 'Бубны', color: '#bd7245' },
 ];
 export const COMBINATIONS = [
-  { id: 'single', label: 'Совпадение', bonus: 0, rank: 0, description: 'Одна совпавшая верхняя фишка: 25 очков. Совпадает пара чисел в любом порядке; масть на совпадение не влияет.' },
-  { id: 'pair', label: 'Пара', bonus: 100, rank: 1, description: 'Две совпавшие верхние фишки с одинаковым верхним числом.' },
-  { id: 'two-pair', label: 'Две пары', bonus: 250, rank: 2, description: 'Две разные пары одинаковых верхних чисел среди совпавших фишек.' },
-  { id: 'trips', label: 'Тройка', bonus: 400, rank: 3, description: 'Три совпавшие фишки с одинаковым верхним числом.' },
-  { id: 'straight', label: 'Стрит', bonus: 600, rank: 4, description: 'Пять последовательных верхних чисел: 1–5 или 2–6. Порядок ячеек не важен.' },
-  { id: 'flush', label: 'Флеш', bonus: 800, rank: 5, description: 'Пять совпавших верхних фишек одной масти. Числа могут повторяться.' },
-  { id: 'full-house', label: 'Фулл-хаус', bonus: 1100, rank: 6, description: 'Три одинаковых верхних числа и пара другого числа.' },
-  { id: 'quads', label: 'Каре', bonus: 1500, rank: 7, description: 'Четыре совпавшие верхние фишки с одинаковым верхним числом.' },
-  { id: 'straight-flush', label: 'Стрит-флеш', bonus: 2200, rank: 8, description: 'Пять последовательных верхних чисел одной масти.' },
-  { id: 'royal', label: 'Роял-стрит', bonus: 3000, rank: 9, description: 'Костяной аналог роял-флеша: 2–3–4–5–6 одной масти. Карточные номиналы 10–A здесь заменены числами костей.' },
-  { id: 'five-kind', label: 'Покер', bonus: 3500, rank: 10, description: 'Пять одинаковых верхних чисел. Для костей повторяющиеся номиналы возможны.' },
-  { id: 'full-straight', label: 'Полный стрит', bonus: 4000, rank: 11, description: 'Все шесть верхних чисел 1–2–3–4–5–6 среди совпавших фишек.' },
-  { id: 'six-kind', label: 'Шесть одинаковых', bonus: 6000, rank: 12, description: 'Все шесть совпавших верхних фишек имеют одинаковое верхнее число.' },
+  { id: 'single', label: 'Совпадение', bonus: 0, baseDice: 3, rank: 0, description: 'Одинаковая пара чисел между рядами в любом порядке. Награда — за каждую новую совпавшую верхнюю фишку.' },
+  { id: 'pair', label: 'Пара', baseDice: 8, rank: 1, description: 'Две совпавшие верхние фишки с одинаковым верхним числом.' },
+  { id: 'two-pair', label: 'Две пары', baseDice: 18, rank: 2, description: 'Две разные пары одинаковых верхних чисел среди совпавших фишек.' },
+  { id: 'trips', label: 'Тройка', baseDice: 30, rank: 3, description: 'Три совпавшие фишки с одинаковым верхним числом.' },
+  { id: 'straight', label: 'Стрит', baseDice: 60, rank: 4, description: 'Пять последовательных верхних чисел: 1–5 или 2–6. Порядок ячеек не важен.' },
+  { id: 'flush', label: 'Флеш', baseDice: 90, rank: 5, description: 'Пять совпавших верхних фишек одной масти. Числа могут повторяться.' },
+  { id: 'full-house', label: 'Фулл-хаус', baseDice: 140, rank: 6, description: 'Три одинаковых верхних числа и пара другого числа.' },
+  { id: 'quads', label: 'Каре', baseDice: 220, rank: 7, description: 'Четыре совпавшие верхние фишки с одинаковым верхним числом.' },
+  { id: 'straight-flush', label: 'Стрит-флеш', baseDice: 400, rank: 8, description: 'Пять последовательных верхних чисел одной масти.' },
+  { id: 'royal', label: 'Роял-стрит', baseDice: 650, rank: 9, description: 'Костяной аналог роял-флеша: 2–3–4–5–6 одной масти. Карточные номиналы 10–A здесь заменены числами костей.' },
+  { id: 'five-kind', label: 'Покер', baseDice: 900, rank: 10, description: 'Пять одинаковых верхних чисел. Для костей повторяющиеся номиналы возможны.' },
+  { id: 'full-straight', label: 'Полный стрит', baseDice: 1200, rank: 11, description: 'Все шесть верхних чисел 1–2–3–4–5–6 среди совпавших фишек.' },
+  { id: 'six-kind', label: 'Шесть одинаковых', baseDice: 2000, rank: 12, description: 'Все шесть совпавших верхних фишек имеют одинаковое верхнее число.' },
 ];
 export const PROBABILITY_TARGETS = [
   { id: 'any', label: 'Любое совпадение', description: 'Хотя бы одна новая верхняя фишка совпадёт с нижним рядом.' },
   ...COMBINATIONS.filter(c => c.id !== 'single').map(c => ({ id: c.id, label: c.label, description: `${c.description} Обязательно хотя бы одно новое, ещё не оплаченное совпадение.` })),
 ];
 const combinations = Object.fromEntries(COMBINATIONS.map(c => [c.id, c]));
+COMBINATIONS.forEach(combo => { combo.bonus = combo.id === 'single' ? 0 : combo.baseDice; });
 export function randomDie(random = Math.random) { return Math.min(6, Math.max(1, Math.floor(random() * 6) + 1)); }
 export function pairKey(tile) { return tile.a <= tile.b ? `${tile.a}:${tile.b}` : `${tile.b}:${tile.a}`; }
 export function tilesMatch(left, right) { return pairKey(left) === pairKey(right); }
@@ -81,7 +82,7 @@ export function fifoStep(lower, inserted) {
 const probabilityCache = new Map();
 function probabilityKey(game, action, target) {
   const awarded = new Set(game.awardedUpperIds || []);
-  return `${action}|${target}|${game.upper.map(t => `${t.a},${t.b},${t.suit},${t.lockRemaining},${awarded.has(t.id) ? 1 : 0}`).join(';')}|${game.lower.map(t => `${t.a},${t.b},${t.lockRemaining}`).join(';')}|${game.rollsLeft}|${game.diceCredits}`;
+  return `${action}|${target}|${game.upper.map(t => `${t.a},${t.b},${t.suit},${t.lockRemaining},${awarded.has(t.id) ? 1 : 0}`).join(';')}|${game.lower.map(t => `${t.a},${t.b},${t.lockRemaining}`).join(';')}`;
 }
 function rollSlots(game) {
   const keys = new Set(game.lower.map(pairKey));
@@ -154,8 +155,8 @@ function suitProbability(slots, target) {
 }
 export function probability(game, action = 'roll', target = game.target || 'any') {
   if (game.phase === 'finished' || !PROBABILITY_TARGETS.some(item => item.id === target)) return 0;
-  if (action === 'roll' && (game.rollsLeft <= 0 || game.upper.every(tile => tile.lockRemaining > 0))) return 0;
-  if (action === 'drop' && (game.diceCredits <= 0 || game.lower.every(tile => tile.lockRemaining > 0))) return 0;
+  if (action === 'roll' && game.upper.every(tile => tile.lockRemaining > 0)) return 0;
+  if (action === 'drop' && game.lower.every(tile => tile.lockRemaining > 0)) return 0;
   const key = probabilityKey(game, action, target);
   if (probabilityCache.has(key)) return probabilityCache.get(key);
   let result = 0;
@@ -168,11 +169,34 @@ export function probability(game, action = 'roll', target = game.target || 'any'
     }
   } else {
     const slots = rollSlots(game);
-    result = ['flush', 'straight-flush', 'royal'].includes(target) ? suitProbability(slots, target) : rankProbability(slots, target);
+    if (target === 'any') result = slots.some(s=>s.fixed&&s.matched&&s.isNew) ? 1 : 1-slots.reduce((p,s)=>p*(s.fixed?1:1-s.q),1);
+    else result = ['flush', 'straight-flush', 'royal'].includes(target) ? suitProbability(slots, target) : rankProbability(slots, target);
   }
   result = Math.min(1, Math.max(0, result));
   if (probabilityCache.size > 500) probabilityCache.clear();
   probabilityCache.set(key, result);
   return result;
 }
-export function ardorIndex(chance) { return Math.min(100, Math.max(0, (1 - chance) * 100)); }
+export function economy(game) {
+  const upperLocks = game.upper.filter(tile => tile.lockRemaining > 0).length;
+  const lowerLocks = game.lower.filter(tile => tile.lockRemaining > 0).length;
+  const locked = upperLocks + lowerLocks;
+  const protectedCards = matchBoard(game.upper, game.lower).cards.filter(tile => tile.lockRemaining > 0);
+  const protectedCombo = evaluateHand(protectedCards);
+  // More control means less uncertainty, lower prizes, and a dearer full reroll.
+  const protection = Math.max(0, protectedCombo.rank + 1);
+  const rawArdor = 100 * (12 - locked) / (12 + protection);
+  const ardor = Math.round(rawArdor * 10) / 10;
+  const rollCost = upperLocks === 6 ? null : Math.ceil(6 * (12 + protection) / (12 - locked));
+  const dropCost = lowerLocks === 6 ? null : Math.max(1, lowerLocks);
+  const scale = rawArdor / 100;
+  const prizes = Object.fromEntries(COMBINATIONS.map(combo => [combo.id, rawArdor > 0 ? Math.ceil(combo.baseDice * scale) : 0]));
+  return { ardor, rawArdor, scale, upperLocks, lowerLocks, locked, protectedCombo, protection, rollCost, dropCost, prizes,
+    availableRolls: rollCost ? Math.floor(game.diceCredits / rollCost) : 0,
+    availableDrops: dropCost ? Math.floor(game.diceCredits / dropCost) : 0 };
+}
+export function ardorIndex(game) { return economy(game).ardor; }
+export function rewardFor(combo, newMatches, quote) {
+  if (!newMatches) return 0;
+  return newMatches * quote.prizes.single + (combo.id !== 'single' && combo.id !== 'none' ? quote.prizes[combo.id] || 0 : 0);
+}

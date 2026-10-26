@@ -9,10 +9,11 @@ const props = defineProps({
     default: 'Сдвинуть нижнюю FIFO-карусель на одну пару за 1 дайс: первая незакреплённая пара уходит, справа появляется новая.',
   },
   credits: { type: Number, default: null },
+  cost: { type: Number, default: 1 },
 });
 defineEmits(['click']);
 
-const unavailable = computed(() => props.disabled || props.busy || (props.credits !== null && props.credits < 1));
+const unavailable = computed(() => props.disabled || props.busy || (props.credits !== null && props.credits < props.cost));
 const positions = {
   2: ['nw', 'se'],
   3: ['nw', 'c', 'se'],
@@ -50,7 +51,7 @@ const cubes = [
       <span class="golden-drop__spark golden-drop__spark--two">✧</span>
     </span>
     <span class="golden-drop__label">{{ busy ? 'Кости в движении…' : 'Drop the Dice' }}<span v-if="!busy" class="golden-drop__arrow" aria-hidden="true">↗</span></span>
-    <span class="golden-drop__cost">−1 дайс<span v-if="credits !== null"> · доступно {{ credits }}</span></span>
+    <span class="golden-drop__cost">−{{ cost }} дайс.<span v-if="credits !== null"> · в кошельке {{ credits }}</span></span>
   </button>
 </template>
 

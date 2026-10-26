@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluateHand, evaluateBoard, pairKey, probability, ardorIndex, fifoStep, hasCombination } from '../src/game/engine.js';
+import { evaluateHand, evaluateBoard, pairKey, probability, ardorIndex, economy, rewardFor, fifoStep, hasCombination } from '../src/game/engine.js';
 
 const tile = (a, b = a, suit = 0, id = `${a}-${b}-${suit}`) => ({ id, a, b, suit, lockRemaining: 0 });
 const hand = (ranks, sameSuit = false) => ranks.map((rank, i) => tile(rank, 1, sameSuit ? 0 : i % 4, `h${i}`));
@@ -41,9 +41,34 @@ test('exact any-match and pair probabilities ignore duplicate lower targets', ()
   const game = state();
   near(probability(game, 'roll', 'any'), 1 - (35 / 36) ** 6);
   near(probability(game, 'roll', 'pair'), 1 - (35 / 36) ** 6 - 6 / 36 * (35 / 36) ** 5);
-  near(ardorIndex(.25), 75);
+  near(ardorIndex(game), 100);
   game.lower = Array.from({ length: 6 }, (_, i) => tile(1, 2, 0, `l${i}`));
   near(probability(game, 'roll', 'any'), 1 - (34 / 36) ** 6);
+});
+
+test('one wallet: lock count lowers Ardor, raises Roll price and sets Drop price', () => {
+  const game=state(); game.diceCredits=120;
+  assert.equal(economy(game).rollCost,6);
+  assert.equal(economy(game).dropCost,1);
+  assert.equal(economy(game).availableRolls,20);
+  for(let i=0;i<3;i++)game.lower[i].lockRemaining=3;
+  const locked=economy(game);
+  assert.equal(locked.dropCost,3);
+  assert.equal(locked.ardor,75);
+  assert.equal(locked.rollCost,8);
+  assert.equal(locked.availableRolls,15);
+  assert.equal(locked.prizes.royal,488);
+  game.upper[0]={...tile(1,1,0,'held0'),lockRemaining:1};
+  const protectedQuote=economy(game);
+  assert(protectedQuote.ardor<locked.ardor);
+  assert(protectedQuote.rollCost>locked.rollCost);
+  assert(protectedQuote.prizes.royal<locked.prizes.royal);
+  assert.equal(rewardFor({id:'pair'},2,locked),2*locked.prizes.single+locked.prizes.pair);
+  game.target='royal';
+  assert.deepEqual(economy(game),protectedQuote); // Browsing a target cannot inflate rewards.
+  game.diceCredits=0;
+  assert.equal(economy(game).availableRolls,0);
+  assert(probability(game,'roll','any')>0); // Physical odds are separate from affordability.
 });
 
 test('held matches count toward a target but cannot alone create new winnings', () => {

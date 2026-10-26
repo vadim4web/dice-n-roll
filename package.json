@@ -1,6 +1,6 @@
 {
   "name": "dice-n-roll",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,7 +10,7 @@
     "preview": "vite preview --host 127.0.0.1",
     "deploy": "npm run build && gh-pages -d dist --nojekyll -b gh-pages",
     "verify:build": "node scripts/verify-build.mjs",
-    "test": "node tests/engine.test.mjs && node tests/session.test.mjs && vitest run",
+    "test": "node tests/engine.test.mjs && node tests/session.test.mjs && node tests/progress.test.mjs && vitest run",
     "test:unit": "vitest run"
   },
   "engines": {

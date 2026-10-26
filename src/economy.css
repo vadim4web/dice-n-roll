@@ -1,0 +1,124 @@
+.hero h1 { font-size: clamp(27px, 2.8vw, 41px); }
+.daily-ribbon { display:flex; align-items:center; gap:36px; padding:18px 23px; margin:0 0 23px; border:1px solid #a7824b55; border-radius:12px; background:linear-gradient(105deg,#4a362133,#291c1c); }
+.daily-ribbon > div { flex:1; }
+.daily-ribbon > div > span { display:block; font-size:8px; letter-spacing:1.25px; color:#ac9579; }
+.daily-ribbon strong { font-family:'Manrope',var(--font); display:block; margin-top:7px; font-size:27px; color:#f5d58b; font-weight:600; letter-spacing:-.8px; }
+.daily-ribbon small { font:9px var(--font); color:#b7a185; letter-spacing:0; }
+.daily-ribbon .text-button { margin-left:auto; color:#dbc28e; white-space:nowrap; }
+.negative { color:#e79c86 !important; }
+.wallet-display { color:#f3d28a; }
+.wallet-display .eyebrow { display:flex; align-items:center; gap:6px; color:#f0d09b; }
+.wallet-display .eyebrow svg { width:15px; height:15px; }
+.wallet-display > strong { font-size:53px; font-weight:700; letter-spacing:-2.6px; text-shadow:0 0 35px #ffc84822; }
+.wallet-unit { display:block; font-size:9px; letter-spacing:3px; color:#ddbc7f; margin-bottom:10px; }
+.wallet-display .score-gain { font-size:8px; color:#a9e0ac; }
+.economy-explainer { display:flex; justify-content:space-between; gap:8px; font-size:8px; color:#aab799; margin-top:19px; border-top:1px solid #a9b28222; padding-top:14px; }
+.economy-explainer b { color:#e8cf91; font-weight:500; }
+.risk-reward { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:16px; }
+.risk-reward > * { text-align:left; background:#1c251dd9; border:1px solid #6d775333; border-radius:7px; padding:10px; }
+.risk-reward span { font-size:7px; color:#b1ba9b; display:block; white-space:nowrap; }
+.risk-reward b { font-size:27px; font-weight:500; display:block; color:#dcb18c; margin-top:6px; }
+.risk-reward button b { color:#f2d99c; }
+.combo-shortlist button { grid-template-columns:auto 1fr; row-gap:3px; }
+.combo-shortlist .prize-value { font-size:17px; color:#f5d38d; margin:0; line-height:1.3; }
+.prize-value small { font-size:7px; color:#c6aa79; }
+.combo-shortlist .combo-mini-symbol { grid-row:span 3; }
+.combo-shortlist .combo-count { font-size:7px !important; color:#a59175 !important; }
+.collection-totals { display:flex; justify-content:space-between; gap:15px; border:1px solid #b3965740; border-radius:9px; padding:13px; margin:20px 0; }
+.collection-totals span { font-size:9px; color:#bcaa87; }
+.collection-totals b { display:block; font-size:23px; font-weight:500; color:#f0ce85; margin-top:6px; }
+.collection-list { display:grid; gap:7px; }
+.collection-list > button { display:flex; align-items:center; text-align:left; gap:13px; padding:13px; border:1px solid #9b7b543d; border-radius:8px; background:linear-gradient(110deg,#624b2429,#33251e); }
+.collection-list > button > span { flex:1; }
+.collection-list strong { display:block; font-size:12px; font-weight:500; }
+.collection-list > button > span > small { display:block; color:#a99a7e; margin-top:6px; font-size:8px; }
+.collection-list > button > b { font-family:'Manrope',var(--font); color:#f3cf84; font-size:28px; letter-spacing:-.8px; text-align:right; font-weight:600; }
+.collection-list > button > b > small { display:block; color:#c0a77c; font:7px var(--font); letter-spacing:0; margin-top:2px; }
+.collection-list svg { height:15px; width:15px; color:#a68860; }
+.legend-prize { background:radial-gradient(ellipse,#b9943533,#48341b33); border:1px solid #d6ae5e55; padding:23px; border-radius:11px; text-align:center; margin:24px 0; }
+.legend-prize strong { display:block; font-family:'Manrope',var(--font); font-size:63px; letter-spacing:-2px; color:#ffdc8b; font-weight:700; line-height:1.25; }
+.legend-prize > span { display:block; color:#cfb585; margin-top:8px; font-size:8px; letter-spacing:1px; }
+.legend-odds { display:grid; grid-template-columns:1fr 1fr; gap:14px; padding:15px 0; }
+.legend-odds > div { border:1px solid #9b7b5433; border-radius:8px; padding:14px; }
+.legend-odds span { display:block; font-size:10px; color:#baa38b; }
+.legend-odds b { display:block; font-size:25px; color:#e7d2a3; margin-top:8px; font-weight:500; letter-spacing:-.7px; }
+.legend-odds small { display:block; color:#ac977c; font-size:9px; margin-top:7px; }
+.legend-owned { display:flex; gap:25px; border-bottom:1px solid #9b7b5433; padding:9px 0 18px; color:#b5a184; font-size:10px; }
+.legend-owned b { margin-left:7px; color:#f1d397; }
+.pair-report { display:grid; grid-template-columns:1fr 1fr; gap:15px; margin:23px 0; }
+.pair-report section { padding:13px; background:#44332444; border:1px solid #a28c4e33; border-radius:9px; }
+.pair-report h3 { font-size:11px; margin:0 0 13px; font-weight:500; color:#d8bf91; }
+.pair-report section:last-child h3 { color:#d7a68d; }
+.pair-report section > div { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-top:12px; }
+.pair-report strong { font-size:16px; font-weight:500; color:#eee1bd; white-space:nowrap; }
+.pair-report section > div > span { font-size:8px; color:#b3a183; text-align:right; line-height:1.6; }
+.pair-report p { font-size:9px; margin:0; }
+@media(max-width:1050px) and (min-width:901px) {
+  .wallet-display > strong { font-size:38px; }
+  .wallet-unit { font-size:7px; }
+  .economy-explainer { font-size:6px; gap:5px; }
+  .risk-reward { gap:6px; }
+  .risk-reward > * { padding:8px; }
+  .risk-reward span { font-size:6px; }
+  .combo-shortlist .prize-value { font-size:14px; }
+  .combo-shortlist .combo-count { font-size:6px !important; }
+}
+@media(max-width:900px) and (min-width:561px) {
+  .ardor-card { display:block; }
+  .ardor-card h2 { max-width:none; }
+  .ardor-card h2 br { display:none; }
+  .target-label { margin-top:20px; }
+  .probability-tabs { margin-top:10px; }
+  .move-card { align-self:stretch; }
+}
+@media(max-width:720px) {
+  .daily-ribbon { gap:15px; padding:14px 17px; margin-bottom:20px; }
+  .daily-ribbon > div > span { font-size:6px; letter-spacing:.7px; }
+  .daily-ribbon strong { font-size:23px; }
+  .daily-ribbon small { display:block; font-size:7px; margin-top:4px; }
+  .daily-ribbon .text-button { font-size:8px; }
+  .wallet-display > strong { font-size:42px; }
+}
+@media(max-width:560px) {
+  .hero h1 { font-size:27px; max-width:260px; }
+  .hero h1 em { display:block; }
+  .hero .eyebrow { font-size:5px; }
+  .hero-right { min-width:75px; }
+  .daily-ribbon { gap:12px; padding:13px 12px; border-radius:10px; margin-bottom:17px; }
+  .daily-ribbon > div > span { font-size:5px; letter-spacing:.3px; }
+  .daily-ribbon strong { font-size:22px; }
+  .daily-ribbon small { font-size:6px; }
+  .daily-ribbon .text-button { font-size:0; gap:0; }
+  .daily-ribbon .text-button svg { width:15px; height:15px; }
+  .wallet-display > strong { font-size:48px; }
+  .wallet-display .eyebrow svg { width:12px; height:12px; }
+  .wallet-unit { font-size:8px; }
+  .wallet-display .score-gain { font-size:7px; }
+  .ardor-card { display:block; padding:22px; }
+  .ardor-card h2 { max-width:none; margin:18px 0 12px; font-size:28px; }
+  .ardor-card h2 br { display:none; }
+  .ardor-reading strong { font-size:68px; }
+  .economy-explainer { font-size:9px; margin-top:17px; }
+  .target-label { font-size:8px; margin-top:22px; }
+  .probability-tabs { margin-top:10px; }
+  .probability-tabs button { font-size:9px; padding:9px; }
+  .chance-line { font-size:11px; margin-top:20px; }
+  .chance-line strong { font-size:22px; }
+  .chance-line.subtle { font-size:8px; }
+  .chance-line.subtle > span:last-child { font-size:10px; }
+  .risk-reward span { font-size:9px; }
+  .risk-reward b { font-size:34px; }
+  .odds-note { font-size:9px; }
+  .combo-shortlist .prize-value { font-size:21px; }
+  .prize-value small { font-size:9px; }
+  .combo-shortlist .combo-count { font-size:8px !important; }
+  .legend-prize strong { font-size:54px; }
+  .collection-list > button { padding:11px; gap:10px; }
+  .collection-list strong { font-size:11px; }
+  .collection-list > button > b { font-size:25px; }
+  .pair-report { gap:10px; }
+  .pair-report section { padding:11px; }
+  .pair-report h3 { font-size:10px; }
+  .pair-report section > div { display:block; }
+  .pair-report section > div > span { display:block; text-align:left; margin-top:4px; }
+}
